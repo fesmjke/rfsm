@@ -105,13 +105,64 @@ mod tests {
 
     #[test]
     fn generic() {
-        let f = Transition::from(String::from("0"), String::from("1"), 'a');
-        let s = Transition::from(String::from("1"), String::from("2"), 'a');
-        let t = Transition::from(String::from("2"), String::from("1"), 'b');
-
+        //        b
+        // --------------<
+        // |             |
+        // |   a     a   |
+        // 0 ---> 1 ---> 2
+        // |             |
+        // |      c      |
+        // >--------------
+        let zero_to_one = Transition::from(String::from("0"), String::from("1"), 'a');
+        let zero_to_two = Transition::from(String::from("0"), String::from("2"), 'c');
+        let one_to_two = Transition::from(String::from("1"), String::from("2"), 'a');
+        let two_to_zero = Transition::from(String::from("2"), String::from("0"), 'b');
 
         let mut state = State::new(String::from("0"), '_');
 
-        todo!();
+        state.add_transition(zero_to_one);
+        state.add_transition(zero_to_two);
+        state.add_transition(one_to_two);
+        state.add_transition(two_to_zero);
+
+        state.next('b');
+
+        assert_eq!(state.state, "0");
+
+        state.next('a');
+
+        assert_eq!(state.state, "1");
+
+        state.next('a');
+
+        assert_eq!(state.state, "2");
+    }
+
+    #[test]
+    fn generic_result() {
+        //        b
+        // --------------<
+        // |             |
+        // |   a     a   |
+        // 0 ---> 1 ---> 2
+        // |             |
+        // |      c      |
+        // >--------------
+        let zero_to_one = Transition::from(String::from("0"), String::from("1"), 'a');
+        let zero_to_two = Transition::from(String::from("0"), String::from("2"), 'c');
+        let one_to_two = Transition::from(String::from("1"), String::from("2"), 'a');
+        let two_to_zero = Transition::from(String::from("2"), String::from("0"), 'b');
+
+        let mut state = State::new(String::from("0"), '_');
+
+        state.add_transition(zero_to_one);
+        state.add_transition(zero_to_two);
+        state.add_transition(one_to_two);
+        state.add_transition(two_to_zero);
+
+        match state.next('a') {
+            Ok(answer) => println!("{:?}", answer),
+            Err(why) => println!("{:?}",why),
+        }
     }
 }
