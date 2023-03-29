@@ -11,6 +11,11 @@ enum Trunstile {
     Locked,
     Unlocked
 }
+#[derive(Debug)]
+enum TransitionError {
+    MissingCondition,
+    Unknown
+}
 
 #[derive(Debug)]
 struct Transition<T, A>{
@@ -36,7 +41,7 @@ struct State<T, A> {
     table: Vec<Vec<T>> // todo
 }
 
-impl<T: Clone, A: std::cmp::PartialEq > State<T, A> {
+impl<T: Clone + std::cmp::PartialEq + std::fmt::Debug, A: std::cmp::PartialEq + Copy + std::fmt::Debug> State<T, A> {
     fn new(init_state : T, init_action: A) -> State<T, A> {
         Self {
             state : init_state,
@@ -54,8 +59,21 @@ impl<T: Clone, A: std::cmp::PartialEq > State<T, A> {
         todo!();
     }
 
-    fn next(&mut self, input : A) {
-        todo!()
+    fn next(&mut self, input : A) -> Result<String, TransitionError> {
+        let conditions : Vec<_> = self.transitions.iter().map(|tr| tr.condition).collect();
+
+        if !conditions.contains(&input) {
+            return Err(TransitionError::MissingCondition);
+        }
+
+        for transitions in self.transitions.iter() {
+            if transitions.from == self.state && transitions.condition == input {
+                self.state = transitions.to.clone();
+                return Ok(format!("state changed to {:?}", self.state));
+            }
+        }
+
+        return Err(TransitionError::Unknown);
     }
 }
 
@@ -90,6 +108,7 @@ mod tests {
         let f = Transition::from(String::from("0"), String::from("1"), 'a');
         let s = Transition::from(String::from("1"), String::from("2"), 'a');
         let t = Transition::from(String::from("2"), String::from("1"), 'b');
+
 
         let mut state = State::new(String::from("0"), '_');
 
