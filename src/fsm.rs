@@ -1,47 +1,43 @@
 #[derive(Debug)]
 pub enum State {
     Locked,
-    Unlocked
+    Unlocked,
 }
 
 pub enum Action {
     Push,
-    Coin
+    Coin,
 }
 
 pub struct Turnstile {
-    pub state : State
+    pub state: State,
 }
 
 impl Turnstile {
     fn new() -> Turnstile {
         Self {
-            state : State::Locked
+            state: State::Locked,
         }
     }
 
-    fn next(&mut self, action : Action) -> String {
+    fn next(&mut self, action: Action) -> String {
         match action {
-            Action::Push => {
-                match self.state {
-                    State::Locked => {
-                        return String::from("LOCKED");
-                    },
-                    State::Unlocked => {
-                        self.state = State::Locked;
-                        return String::from("PASS");
-                    },
+            Action::Push => match self.state {
+                State::Locked => {
+                    return String::from("LOCKED");
+                }
+                State::Unlocked => {
+                    self.state = State::Locked;
+                    return String::from("PASS");
                 }
             },
-            Action::Coin => {
-                match self.state {
-                    State::Locked => {
-                        self.state = State::Unlocked;
-                        return String::from("UNLOCKED");
-                    },
-                    State::Unlocked => {
-                        return String::from("COIN");
-                    }
+            Action::Coin => match self.state {
+                State::Locked => {
+                    self.state = State::Unlocked;
+                    return String::from("UNLOCKED");
+                }
+                State::Unlocked => {
+                    return String::from("COIN");
                 }
             },
         }
